@@ -1,0 +1,12 @@
+---
+
+- name: ensure apache is at the latest version
+  package: name={{apache}} state=latest
+
+- name: ensure apache is running (and enable it at boot)
+  service: name={{apache}} state=started enabled=yes
+
+- name: deploy sample Web site
+  template:
+    src: index.html.j2
+    dest: /var/www/html/index.html

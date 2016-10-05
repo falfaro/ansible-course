@@ -1,0 +1,42 @@
+# sshd
+#
+# VERSION               0.0.2
+
+FROM ubuntu:16.04
+MAINTAINER Felipe Alfaro Solana <felipe.alfaro@gmail.com>
+
+RUN useradd -m ansible -s /bin/bash
+RUN usermod -aG sudo ansible
+
+COPY id_rsa.pub /home/ansible/.ssh/authorized_keys
+COPY id_rsa.pub /home/ansible/.ssh/
+COPY id_rsa /home/ansible/.ssh/
+RUN chown -R ansible:ansible /home/ansible/.ssh
+
+RUN apt-get update
+RUN apt-get install -y \
+  byobu \
+  curl \
+  net-tools \
+  openssh-server \
+  software-properties-common \
+  sudo \
+  vim
+RUN apt-add-repository -y ppa:ansible/ansible
+RUN apt-get update
+RUN apt-get install -y \
+  ansible
+RUN apt-get clean
+
+RUN mkdir /var/run/sshd
+RUN echo 'root:ansible' | chpasswd
+
+# SSH login fix. Otherwise user is kicked off after login
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
+COPY sudoers /etc/sudoers
+ENV NOTVISIBLE "in users profile"
+RUN echo "export VISIBLE=now" >> /etc/profile
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D", "-E", "/var/log/sshd"]

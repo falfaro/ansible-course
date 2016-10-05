@@ -1,0 +1,8 @@
+[webservers]
+webserver01
+webserver02
+webserver03
+
+[loadbalancers]
+master
+slave

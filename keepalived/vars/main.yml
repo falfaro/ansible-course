@@ -1,0 +1,11 @@
+---
+
+- keepalived_shared_iface: eth1
+- keepalived_shared_ip: 172.28.128.100
+- haproxy_backend_servers:
+  - name: webserver01
+    address: 172.17.0.2:80
+  - name: webserver02
+    address: 172.17.0.3:80
+  - name: webserver03
+    address: 172.17.0.4:80

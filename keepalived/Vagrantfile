@@ -1,0 +1,39 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile used to spawn 2 virtual machines based on Ubuntu, where
+# keepalived and HAproxy will be deployed using Ansible.
+#
+# The 2 virtual machines start with 2 interface. The usual NAT interface
+# (eth0) for management and a "private network" so the two VM can "see"
+# each other.
+#
+# keepalived requires proper IPv4 multicast support, which might not
+# interact properly when ran inside a container. Hence the use of a
+# full virtual machine instead of a Docker container.
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're
+# doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "ubuntu/trusty64"
+
+  # master VM with a hard-coded IPv4 address
+  config.vm.define "master" do |master|
+    master.vm.hostname = "master"
+    master.vm.network "private_network", ip: "172.28.128.3"
+    master.vm.provision "file", source: "/home/ansible/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
+    master.ssh.insert_key = false
+    master.ssh.private_key_path = ["/home/ansible/.ssh/id_rsa", "~/.vagrant.d/insecure_private_key"]
+  end
+
+  # slave VM with a hard-coded IPv4 address
+  config.vm.define "slave" do |slave|
+    slave.vm.hostname = "slave"
+    slave.vm.network "private_network", ip: "172.28.128.4"
+    slave.vm.provision "file", source: "/home/ansible/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
+    slave.ssh.insert_key = false
+    slave.ssh.private_key_path = ["/home/ansible/.ssh/id_rsa", "~/.vagrant.d/insecure_private_key"]
+  end
+end

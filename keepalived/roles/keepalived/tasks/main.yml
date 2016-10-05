@@ -1,0 +1,19 @@
+---
+# This role installs and sets up keepalived
+
+- name: Install keepalived
+  apt: name=keepalived state=latest
+  tags: keepalived
+  notify: restart keepalived
+  become: true
+
+- name: Configure keepalived
+  template: src=keepalived.conf.j2 dest=/etc/keepalived/keepalived.conf
+  tags: keepalived
+  notify: restart keepalived
+  become: true
+
+- name: Start keepalived
+  service: name=keepalived state=running
+  tags: keepalived
+  become: true
