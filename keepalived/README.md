@@ -19,3 +19,9 @@ To deploy the entire service using Ansible:
 ```
 $ ansible-playbook -i inv deploy.yml
 ```
+
+The last step in the deployment process checks that the load-balanced VIP responds with an OpenSSH banner in port 22. However, to test that load-balancing works, use the following "curl" multiple times and observe how the response (which embeds the hostname of the Web server that is servicing the request) changes over time:
+
+```
+$ curl http://172.28.128.100
+```
